@@ -1,0 +1,148 @@
+[
+  {
+    "type": "function",
+    "name": "requestV2",
+    "inputs": [],
+    "outputs": [
+      { "name": "assignedSequenceNumber", "type": "uint64", "internalType": "uint64" }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "requestV2",
+    "inputs": [
+      { "name": "gasLimit", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [
+      { "name": "assignedSequenceNumber", "type": "uint64", "internalType": "uint64" }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "requestV2",
+    "inputs": [
+      { "name": "provider", "type": "address", "internalType": "address" }
+    ],
+    "outputs": [
+      { "name": "assignedSequenceNumber", "type": "uint64", "internalType": "uint64" }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "requestV2",
+    "inputs": [
+      { "name": "provider", "type": "address", "internalType": "address" },
+      { "name": "userRandomNumber", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "gasLimit", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [
+      { "name": "assignedSequenceNumber", "type": "uint64", "internalType": "uint64" }
+    ],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "getFeeV2",
+    "inputs": [],
+    "outputs": [
+      { "name": "feeAmount", "type": "uint128", "internalType": "uint128" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getFeeV2",
+    "inputs": [
+      { "name": "gasLimit", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [
+      { "name": "feeAmount", "type": "uint128", "internalType": "uint128" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getFeeV2",
+    "inputs": [
+      { "name": "provider", "type": "address", "internalType": "address" },
+      { "name": "gasLimit", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [
+      { "name": "feeAmount", "type": "uint128", "internalType": "uint128" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getDefaultProvider",
+    "inputs": [],
+    "outputs": [
+      { "name": "provider", "type": "address", "internalType": "address" }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "revealWithCallback",
+    "inputs": [
+      { "name": "provider", "type": "address", "internalType": "address" },
+      { "name": "sequenceNumber", "type": "uint64", "internalType": "uint64" },
+      { "name": "userContribution", "type": "bytes32", "internalType": "bytes32" },
+      { "name": "providerContribution", "type": "bytes32", "internalType": "bytes32" }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "Requested",
+    "inputs": [
+      { "name": "sequenceNumber", "type": "uint64", "indexed": true, "internalType": "uint64" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RequestedWithCallback",
+    "inputs": [
+      { "name": "provider", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "requestor", "type": "address", "indexed": true, "internalType": "address" },
+      { "name": "sequenceNumber", "type": "uint64", "indexed": true, "internalType": "uint64" },
+      { "name": "userRandomNumber", "type": "bytes32", "indexed": false, "internalType": "bytes32" }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "InsufficientFee",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NoSuchProvider",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NoSuchRequest",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "InvalidReveal",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "Unauthorized",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "RequestAlreadyFulfilled",
+    "inputs": []
+  }
+]

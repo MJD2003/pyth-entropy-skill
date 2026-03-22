@@ -1,0 +1,80 @@
+# Pyth Entropy v2 Integration Skill
+
+You have access to the Pyth Entropy skill for integrating on-chain verifiable randomness into EVM smart contracts.
+
+## When to activate
+
+Activate this skill when the user asks to:
+- "integrate Pyth Entropy", "add on-chain randomness", "generate random numbers on-chain"
+- "use Pyth RNG", "implement a coin flip", "add verifiable randomness"
+- "implement free respins", "derive multiple random values", "add provably fair randomness"
+- "implement a lottery", "add random loot drops", "build a prize wheel"
+- Or mentions: Pyth Entropy, IEntropyV2, entropyCallback, verifiable randomness
+
+## Workflow (always follow in order)
+
+### Step 1: Detect Project Stack (CRITICAL — do this first)
+Before generating any code, scan the codebase:
+1. **Framework**: `foundry.toml` → Foundry | `hardhat.config.*` → Hardhat | `truffle-config.js` → Truffle
+2. **Off-chain lib**: `package.json` with `ethers` / `viem` / `web3` | `requirements.txt` with `web3` → Python
+3. **Style**: Match existing naming, directory layout, imports
+4. **Chain**: Check `.env`, deploy configs → find correct Entropy address
+
+### Step 2: Install SDK
+- Foundry: `npm install @pythnetwork/entropy-sdk-solidity` + add to `remappings.txt`
+- Hardhat/Truffle: `npm install @pythnetwork/entropy-sdk-solidity`
+
+### Step 3: Contract Requirements
+Every Entropy consumer contract must:
+1. Import `IEntropyConsumer` and `IEntropyV2` from `@pythnetwork/entropy-sdk-solidity`
+2. Inherit `IEntropyConsumer`
+3. Store `IEntropyV2 entropy` (set in constructor)
+4. Implement `getEntropy()` returning `address(entropy)`
+5. Implement `entropyCallback(uint64 sequenceNumber, address provider, bytes32 randomNumber)` — **MUST NEVER REVERT**
+6. Use `entropy.getFeeV2()` for fee, send with `entropy.requestV2{value: fee}()`
+
+### Step 4: Request Variants
+| Variant | Signature | Use When |
+|---------|-----------|----------|
+| Basic | `requestV2()` | Default, simplest |
+| Custom gas | `requestV2(uint32 gasLimit)` | Complex callback needs more gas |
+| Custom provider | `requestV2(address provider)` | Specific entropy provider |
+| Full control | `requestV2(address, bytes32, uint32)` | Maximum flexibility |
+
+Fee must match variant: basic → `getFeeV2()`, custom gas → `getFeeV2(gasLimit)`
+
+### Step 5: Transform Results
+- **Range**: `min + int256(uint256(randomNumber) % range)`
+- **Multiple values**: `keccak256(abi.encodePacked(randomNumber, "label"))` per attribute
+- **Free respin**: `keccak256(abi.encodePacked(originalRandom, nonce))` — increment nonce by 2 per respin (even=shuffle, odd=selection), cap at MAX_FREE_RESPINS
+- **Weighted**: Map `uint256(random) % totalWeight` to cumulative weight buckets
+
+### Contract Addresses
+- **Optimism/Base/Mode**: `0x4821932D0CDd71225A6d914706A621e0389D7061`
+- **Ethereum/Arbitrum/Polygon/etc**: `0x549Ebba8036Ab86D79D9deFba1A495D0710C0983`
+- **Blast**: `0x5744Cbf430D99456a0A8771208b674F27f8EF0Fb`
+- **Default mainnet provider**: `0x52DeaA1c84233F7bb8C8A45baeDE41091c616506`
+- **Default testnet provider**: `0x6CC14824Ea2918f5De5C2f75A9Da968ad4BD6344`
+- Fees are DYNAMIC — always call `getFeeV2()` on-chain, never hardcode.
+
+### Gas Limits
+- Simple callback: 50,000–100,000
+- Moderate: 100,000–200,000
+- Complex: 200,000–500,000
+
+### Common Pitfalls
+- Callback reverts → keeper can't deliver. Never `require()` in callback.
+- Hardcoded fees → will break. Always `getFeeV2()`.
+- Wrong gas limit → callback silently fails.
+- No reentrancy protection → callback is external call, use checks-effects-interactions.
+
+## Reference Templates
+If deeper patterns are needed, read these files from the skill directory:
+- `assets/solidity/EntropyConsumerBase.sol` — Abstract base contract
+- `assets/solidity/SingleRandom.sol` — Coin flip
+- `assets/solidity/MultiRandom.sol` — Multi-value derivation
+- `assets/solidity/RespinRandom.sol` — Free respin pattern
+- `assets/solidity/WeightedRandom.sol` — Weighted loot table
+- `assets/solidity/test/EntropyTest.sol` — MockEntropy + test base
+- `assets/typescript/use-entropy.ts` — React/wagmi hook
+- `references/security.md` — Trust model, MEV, safety checklist

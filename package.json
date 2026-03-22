@@ -1,0 +1,40 @@
+{
+  "name": "pyth-entropy-skill",
+  "version": "0.1.0",
+  "description": "Pyth Entropy v2 integration skill for AI-powered IDEs",
+  "bin": {
+    "pyth-entropy": "./bin/cli.js"
+  },
+  "keywords": [
+    "pyth",
+    "entropy",
+    "randomness",
+    "rng",
+    "solidity",
+    "evm",
+    "smart-contracts",
+    "ai-skill",
+    "cursor",
+    "windsurf",
+    "claude-code"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MJD2003/pyth-entropy-skill"
+  },
+  "files": [
+    "bin/",
+    "SKILL.md",
+    "references/",
+    "assets/",
+    "scripts/",
+    ".cursorrules",
+    ".cursor/",
+    ".windsurfrules",
+    ".claude/",
+    ".github/",
+    ".clinerules"
+  ]
+}

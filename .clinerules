@@ -1,0 +1,31 @@
+# Pyth Entropy v2 — Cline/Roo Integration
+
+When the user asks about on-chain randomness, Pyth Entropy, coin flips, lotteries, loot drops, prize wheels, provably fair, or verifiable randomness — use this guide.
+
+## Workflow
+1. Detect stack: `foundry.toml` → Foundry | `hardhat.config.*` → Hardhat | check `package.json` for ethers/viem/web3
+2. Install: `npm install @pythnetwork/entropy-sdk-solidity`
+3. Foundry: add `@pythnetwork/entropy-sdk-solidity/=node_modules/@pythnetwork/entropy-sdk-solidity` to `remappings.txt`
+
+## Contract Must Have
+1. Import `IEntropyConsumer` + `IEntropyV2` from SDK
+2. Inherit `IEntropyConsumer`
+3. Store `IEntropyV2 entropy` in constructor
+4. `getEntropy()` → `address(entropy)`
+5. `entropyCallback(uint64, address, bytes32)` — NEVER REVERT
+6. `entropy.getFeeV2()` for fee → `entropy.requestV2{value: fee}()`
+
+## Chain Addresses
+- Optimism/Base/Mode: `0x4821932D0CDd71225A6d914706A621e0389D7061`
+- Ethereum/Arbitrum/Polygon: `0x549Ebba8036Ab86D79D9deFba1A495D0710C0983`
+- Blast: `0x5744Cbf430D99456a0A8771208b674F27f8EF0Fb`
+- Mainnet provider: `0x52DeaA1c84233F7bb8C8A45baeDE41091c616506`
+- Testnet provider: `0x6CC14824Ea2918f5De5C2f75A9Da968ad4BD6344`
+
+## Transform Results
+- Range: `min + int256(uint256(randomNumber) % range)`
+- Multiple: `keccak256(abi.encodePacked(randomNumber, "label"))`
+- Free respin: `keccak256(abi.encodePacked(original, nonce))` — 2 nonces per respin, max 3
+- Weighted: `uint256(random) % totalWeight` → cumulative bucket
+
+## Critical: `entropyCallback` MUST NEVER REVERT. Fees are DYNAMIC — always `getFeeV2()`.

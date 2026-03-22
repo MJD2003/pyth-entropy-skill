@@ -1,0 +1,61 @@
+# Pyth Entropy v2 Integration Skill
+
+You have the Pyth Entropy skill for integrating on-chain verifiable randomness into EVM smart contracts.
+
+## Activation Triggers
+Activate when the user mentions: "Pyth Entropy", "on-chain randomness", "random numbers on-chain", "coin flip", "verifiable randomness", "free respins", "provably fair", "lottery", "loot drops", "prize wheel", "IEntropyV2", "entropyCallback", "on-chain RNG".
+
+## Workflow — Always Follow In Order
+
+### 1. Detect Stack First
+Scan the codebase before generating code:
+- `foundry.toml` → Foundry | `hardhat.config.*` → Hardhat
+- `package.json` with `ethers`/`viem`/`web3` → match that library
+- `requirements.txt` with `web3` → Python web3.py
+- Match existing naming conventions and directory layout
+
+### 2. Install SDK
+- Foundry: `npm install @pythnetwork/entropy-sdk-solidity` + `remappings.txt`
+- Hardhat: `npm install @pythnetwork/entropy-sdk-solidity`
+
+### 3. Contract Must Have
+1. Import `IEntropyConsumer` + `IEntropyV2` from SDK
+2. Inherit `IEntropyConsumer`
+3. Store `IEntropyV2 entropy` in constructor
+4. `getEntropy()` → `address(entropy)`
+5. `entropyCallback(uint64, address, bytes32)` — **NEVER REVERT**
+6. `entropy.getFeeV2()` for fee → `entropy.requestV2{value: fee}()`
+
+### 4. Request Variants
+- Basic: `requestV2()` + `getFeeV2()`
+- Custom gas: `requestV2(gasLimit)` + `getFeeV2(gasLimit)`
+- Custom provider: `requestV2(provider)` + `getFeeV2()`
+- Full: `requestV2(provider, userRandom, gasLimit)` + `getFeeV2(provider, gasLimit)`
+
+### 5. Transform Results
+- Range: `min + int256(uint256(randomNumber) % range)`
+- Multi-value: `keccak256(abi.encodePacked(randomNumber, "label"))`
+- Free respin: derive from original with nonce, 2 nonces per respin, max 3
+- Weighted: `uint256(random) % totalWeight` → cumulative bucket selection
+
+### Chain Addresses
+- Optimism/Base/Mode: `0x4821932D0CDd71225A6d914706A621e0389D7061`
+- Ethereum/Arbitrum/Polygon/etc: `0x549Ebba8036Ab86D79D9deFba1A495D0710C0983`
+- Blast: `0x5744Cbf430D99456a0A8771208b674F27f8EF0Fb`
+- Mainnet provider: `0x52DeaA1c84233F7bb8C8A45baeDE41091c616506`
+- Testnet provider: `0x6CC14824Ea2918f5De5C2f75A9Da968ad4BD6344`
+- Fees are DYNAMIC — always `getFeeV2()`, never hardcode
+
+### Critical Rules
+- `entropyCallback` must NEVER revert — use `if/return` not `require`
+- Use checks-effects-interactions pattern in callback
+- For high-value apps: use private mempools (Flashbots Protect)
+- Gas: simple=50-100k, moderate=100-200k, complex=200-500k
+
+## Deeper Reference
+For full patterns, read from the skill directory:
+- `assets/solidity/*.sol` — 5 contract patterns + test mock
+- `assets/typescript/use-entropy.ts` — React/wagmi hook
+- `references/patterns.md` — Derivation, respin, weighted, shuffle
+- `references/security.md` — Trust model, MEV, safety checklist
+- `references/chainlist.md` — Full chain addresses table
